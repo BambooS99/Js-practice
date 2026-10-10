@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import "./App.css";
 import { useMockData } from "./api/API";
+import DebounceSection from "./DebounceSection";
 
 function App() {
   const { data } = useMockData();
@@ -11,6 +12,7 @@ function App() {
   const [isCurrencyConverted, setIsCurrencyConverted] = useState(false);
   const [itemSearchedFor, setItemSearchedFor] = useState("");
   const [findAnyItem, setFindAnyItem] = useState(false);
+  const [hideSection1, setHideSection1] = useState(false);
 
   const query = text.toLowerCase().trim();
 
@@ -76,6 +78,10 @@ function App() {
       : setIsCurrencyConverted(true);
   }
 
+  function handleHideSection() {
+    hideSection1 ? setHideSection1(false) : setHideSection1(true);
+  }
+
   function handleAnyItemClick() {
     findAnyItem ? setFindAnyItem(false) : setFindAnyItem(true);
   }
@@ -95,58 +101,74 @@ function App() {
   //
   return (
     <>
-      <div>
-        <h1>Search for your item: </h1>
-        <input type="text" value={text} onChange={handleChange}></input>
-        <button>Go</button>
-      </div>
-      <ul>
-        {matchingStores?.map((stores) => (
-          <li key={stores.id}>{stores.name}</li>
-        ))}
-      </ul>
-      <div>
-        <button onClick={handleDistance}>Sort by distance</button>
-        {sortedList?.map((stores) => (
-          <li key={stores.id}>{stores.name}</li>
-        ))}
-      </div>
-      <h1> Sorted Stores</h1>
-      <ul>
-        <button
-          onClick={() => (isOnSale ? setIsOnSale(false) : setIsOnSale(true))}>
-          Show sale prices
-        </button>
+      <button onClick={handleHideSection}> Hide Section 1</button>
 
-        {firstStoreSale?.map((item) => (
-          <li key={item.id}>
-            {item.name + ""}
-            {item.salePrice}
-          </li>
-        ))}
-      </ul>
-      <h1>Prices with converted Currency: </h1>
-      <button onClick={handleCurrencyConversion}> show</button>
-      <ul>
-        {currencyConverted?.map((item) =>
-          item.map((x) => (
-            <li key={x.id}>
-              {x.name} {x.convertedCurrency}
-            </li>
-          )),
-        )}
-      </ul>
-      <h1>Find any item</h1>
-      <input
-        type="text"
-        value={itemSearchedFor}
-        onChange={handleSearchChange}></input>{" "}
-      <button onClick={handleAnyItemClick}>Go!</button>
-      <ul>
-        {itemSearchResults?.map((item) => (
-          <li key={item.id}>{item.name}</li>
-        ))}
-      </ul>
+      {!hideSection1 ? (
+        <>
+          <div>
+            <h1>Search for your item: </h1>
+            <input type="text" value={text} onChange={handleChange}></input>
+            <button>Go</button>
+          </div>
+          <ul>
+            {matchingStores?.map((stores) => (
+              <li key={stores.id}>{stores.name}</li>
+            ))}
+          </ul>
+          <div>
+            <button onClick={handleDistance}>Sort by distance</button>
+            {sortedList?.map((stores) => (
+              <li key={stores.id}>{stores.name}</li>
+            ))}
+          </div>
+          <h1> Sorted Stores</h1>
+          <ul>
+            <button
+              onClick={() =>
+                isOnSale ? setIsOnSale(false) : setIsOnSale(true)
+              }>
+              Show sale prices
+            </button>
+
+            {firstStoreSale?.map((item) => (
+              <li key={item.id}>
+                {item.name + ""}
+                {item.salePrice}
+              </li>
+            ))}
+          </ul>
+          <h1>Prices with converted Currency: </h1>
+          <button onClick={handleCurrencyConversion}> show</button>
+          <ul>
+            {currencyConverted?.map((item) =>
+              item.map((x) => (
+                <li key={x.id}>
+                  {x.name} {x.convertedCurrency}
+                </li>
+              )),
+            )}
+          </ul>
+          <h1>Find any item</h1>
+          <input
+            type="text"
+            value={itemSearchedFor}
+            onChange={handleSearchChange}></input>{" "}
+          <button onClick={handleAnyItemClick}>Go!</button>
+          <ul>
+            {itemSearchResults?.map((item) => (
+              <li key={item.id}>{item.name}</li>
+            ))}
+          </ul>
+        </>
+      ) : (
+        <>
+          <div>
+            <h1>
+              <DebounceSection />
+            </h1>
+          </div>{" "}
+        </>
+      )}
     </>
   );
 }
